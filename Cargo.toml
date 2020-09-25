@@ -1,0 +1,24 @@
+[package]
+name = "tdn_storage"
+version = "0.1.0"
+authors = ["CypherLink <contact@cypherlink.io>"]
+edition = "2018"
+license = "MIT/Apache-2.0"
+description = "A pluggable library for TDN, include local file, local db, distributed db, decentralized db."
+keywords = ["storage", "database", "distributed", "decentralized"]
+
+[features]
+default = ["local"]
+local = ["sled"]
+distributed = []
+decentralized = []
+
+[dependencies]
+async-fs = "1.3"
+tdn_types = "0.2"
+postcard = { version = "0.5", default-features = false, features = ["alloc"] }
+serde = { version = "1.0", default-features = false }
+sled = { version = "0.34", optional = true }
+
+[dev-dependencies]
+smol = "1"
