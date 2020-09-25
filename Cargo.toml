@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["CypherLink <contact@cypherlink.io>"]
 edition = "2018"
 license = "MIT/Apache-2.0"
+repository = "https://github.com/cypherlink/tdn_storage"
 description = "A pluggable library for TDN, include local file, local db, distributed db, decentralized db."
 keywords = ["storage", "database", "distributed", "decentralized"]
 
