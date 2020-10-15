@@ -5,6 +5,7 @@ use std::{
     path::PathBuf,
 };
 use tdn_types::primitive::DEFAULT_STORAGE_DIR;
+use tdn_types::storage::Storage;
 
 fn new_error(s: &str) -> Error {
     Error::new(ErrorKind::Other, s)
@@ -25,13 +26,10 @@ pub struct LocalDB {
     tree: sled::Db,
 }
 
-impl LocalDB {
-    pub fn open_absolute(path: &PathBuf) -> Result<LocalDB> {
-        let tree = sled::open(path).map_err(|_e| new_error("db open failure!"))?;
-        Ok(LocalDB { tree })
-    }
+impl Storage for LocalDB {
+    type Key = Vec<u8>;
 
-    pub fn read<T: Serialize + DeserializeOwned>(&self, k: &[u8]) -> Option<T> {
+    fn read<T: Serialize + DeserializeOwned>(&self, k: &Self::Key) -> Option<T> {
         self.tree
             .get(k)
             .ok()
@@ -41,7 +39,7 @@ impl LocalDB {
             .flatten()
     }
 
-    pub fn write<T: Serialize + DeserializeOwned>(&self, k: Vec<u8>, t: &T) -> Result<()> {
+    fn write<T: Serialize + DeserializeOwned>(&self, k: &Self::Key, t: &T) -> Result<()> {
         to_allocvec(t)
             .map_err(|_e| new_error("db serialize error!"))
             .and_then(|bytes| {
@@ -55,7 +53,7 @@ impl LocalDB {
             })
     }
 
-    pub fn update<T: Serialize + DeserializeOwned>(&self, k: Vec<u8>, t: &T) -> Result<()> {
+    fn update<T: Serialize + DeserializeOwned>(&self, k: &Vec<u8>, t: &T) -> Result<()> {
         to_allocvec(&t)
             .map_err(|_e| new_error("db serialize error!"))
             .and_then(|bytes| {
@@ -80,7 +78,7 @@ impl LocalDB {
             })
     }
 
-    pub fn delete<T: Serialize + DeserializeOwned>(&self, k: &[u8]) -> Result<T> {
+    fn delete<T: Serialize + DeserializeOwned>(&self, k: &Self::Key) -> Result<T> {
         let result = self.read::<T>(k);
         if result.is_some() {
             self.tree
@@ -94,6 +92,13 @@ impl LocalDB {
         } else {
             Err(new_error("db delete key not found!"))
         }
+    }
+}
+
+impl LocalDB {
+    pub fn open_absolute(path: &PathBuf) -> Result<LocalDB> {
+        let tree = sled::open(path).map_err(|_e| new_error("db open failure!"))?;
+        Ok(LocalDB { tree })
     }
 
     fn _flush(&self) -> Result<()> {
@@ -111,9 +116,9 @@ fn test_db_file() {
     let value_b = "B".to_owned();
 
     let db = open_db(name).unwrap();
-    assert_eq!(db.write(key.clone(), &value).ok(), Some(()));
+    assert_eq!(db.write(&key, &value).ok(), Some(()));
     assert_eq!(db.read::<String>(&key), Some(value.clone()));
-    assert_eq!(db.update::<String>(key.clone(), &value_b).ok(), Some(()));
+    assert_eq!(db.update::<String>(&key, &value_b).ok(), Some(()));
     assert_eq!(db.read::<String>(&key), Some(value_b.clone()));
     assert_eq!(db.delete::<String>(&key).ok(), Some(value_b));
     assert_eq!(db.read::<String>(&key), None);
