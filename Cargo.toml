@@ -11,7 +11,7 @@ keywords = ["storage", "database", "distributed", "decentralized"]
 [features]
 default = ["local"]
 local = ["sled"]
-distributed = []
+distributed = ["rusqlite"]
 decentralized = []
 
 [dependencies]
@@ -21,6 +21,7 @@ tdn_types = { path = "../TDN/types" }
 postcard = { version = "0.5", default-features = false, features = ["alloc"] }
 serde = { version = "1.0", default-features = false }
 sled = { version = "0.34", optional = true }
+rusqlite = {version = "0.24", optional = true, features = ["bundled"] }
 
 [dev-dependencies]
 smol = "1"
