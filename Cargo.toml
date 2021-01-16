@@ -10,8 +10,8 @@ keywords = ["storage", "database", "distributed", "decentralized"]
 
 [features]
 default = ["local"]
-local = ["sled"]
-distributed = ["rusqlite"]
+local = ["rusqlite"]
+distributed = []
 decentralized = []
 
 [dependencies]
