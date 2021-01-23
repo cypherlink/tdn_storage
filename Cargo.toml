@@ -1,5 +1,5 @@
 [package]
-name = "tdn_storage"
+name = "tdn-storage"
 version = "0.1.0"
 authors = ["CypherLink <contact@cypherlink.io>"]
 edition = "2018"
@@ -16,8 +16,7 @@ decentralized = []
 
 [dependencies]
 async-fs = "1.3"
-#tdn_types = "0.2"
-tdn_types = { path = "../TDN/types" }
+tdn-types = { git = "https://github.com/cypherlink/TDN", branch="main" }
 postcard = { version = "0.5", default-features = false, features = ["alloc"] }
 serde = { version = "1.0", default-features = false }
 sled = { version = "0.34", optional = true }
